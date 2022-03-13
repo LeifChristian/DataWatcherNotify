@@ -6,6 +6,7 @@ const fs = require("fs");
 const readline = require("readline");
 const { google } = require("googleapis");
 
+
 const accountSid = "AC6ebe7209c21cd5fbcdb66a63e691737f";
 const authToken = "d50704a654d95bd4e1b2f56d34a51329";
 
@@ -26,7 +27,7 @@ let repCount = 0;
 
 // 10000 is ten seconds, 60000 is one minute, 3600000 is one hour, 86400000 is 24 hours
 
-let interval = 60000
+let interval = 600000
 let firstPassAda = true;
 let firstPassBtc = true;
 
@@ -173,13 +174,15 @@ let getbtc = async () => {
           let timeElapsed = Date.now();
           const today = new Date(timeElapsed)
 
-          client.calls
-          .create({
-             twiml: `<Response><Pause length="1"/><Say voice="woman"> ${today.toDateString().slice(4)}!! ${message}</Say></Response>`,
-             to: '+14065390742',
-             from: '+14062154416'
-           })
-          .then(call => console.log(call.sid));}
+          // client.calls
+          // .create({
+          //    twiml: `<Response><Pause length="1"/><Say voice="woman"> ${today.toDateString().slice(4)}!! ${message}</Say></Response>`,
+          //    to: '+14065390742',
+          //    from: '+14062154416'
+          //  })
+          // .then(call => console.log(call.sid));
+        
+        }
 
             resultbtc=null;
 
