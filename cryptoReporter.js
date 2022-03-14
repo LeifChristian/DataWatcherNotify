@@ -16,6 +16,7 @@ const config = {
 };
 
 let lastbtc = [];
+let URGENT = false;
 let resultbtc = null;
 let repCount = 0;
 let firstPassBtc = true;
@@ -65,7 +66,7 @@ let getbtc = async () => {
                     console.log(percentChange, "% change");
                     let message;
                     for (let b in percentArray) {
-                        if (percentArray[b].price >= 2 && percentArray[b].price < 5) {
+                        if (percentArray[b].price >= 3 && percentArray[b].price < 5) {
                             if (percentArray[b]?.direction) {
                                 message = `Alert! BTC Price went ${percentArray[b].direction} by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
                                 console.log(message);
@@ -79,7 +80,10 @@ let getbtc = async () => {
 
                         // if (percentArray[b].price < 1) { // -- dev version
 
+                                URGENT = true;
+
                             if (percentArray[b]?.direction) {
+                               
                                 message = ` Alert! BTC Price went ${percentArray[b].direction} by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
                                 console.log(message);
                             } else {
@@ -94,6 +98,10 @@ let getbtc = async () => {
 
                     if (message) {
                         sendEmail(message);
+                        repCount = 6;
+
+                        if(URGENT){
+
                         client.messages
                         .create({
                             body: message,
@@ -113,9 +121,11 @@ let getbtc = async () => {
                             from: "+14062154416",
                         })
                         .then((call) => console.log(call.sid));
-                        repCount = 6;
+                    }
+                       
                     }
                     resultbtc = null;
+                    URGENT = false;
                 }
             }
         })
