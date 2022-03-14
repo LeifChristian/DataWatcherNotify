@@ -14,7 +14,7 @@ Integrating Gmail and Twilio APIs with coingecko's API for realtime price inform
 # GMAIL API
 This app will require your own API key from Gmail, which will be included in the project in a credentials.json and a token.json file. More info here: https://developers.google.com/gmail/api/quickstart/nodejs.
 
-Run the app once installed, Follow Google prompts in the cli to confirm and generate your local auth token.
+Run the app once installed, Follow Google prompts via the cli to confirm and generate your local auth token.
 
 # ADAPTATION IDEAS
 This app can be used to watch any data and notify a user via phone or email if a condition changes based on an API response.
@@ -23,7 +23,9 @@ Can auto send a response to a user based on any condition.
 Heck, you could even call someone every year on their birthday.
 
 # ENVIRONMENT VARIABLES
-API tokens for Gmail and Twilio should be stored in .env file in the root of the project. Accessed through process.env and the dotenv package.
+API tokens for Twilio should be stored in .env file in the root of the project. 
+Accessed these variables via process.env.MY_VARIABLE and the dotenv package, which is included.
+View the Gmail API documentation to create your credentials.json and generate your token.
 
 in your .env file in the root of the project, add the folowing variables:
 
