@@ -12,7 +12,7 @@ nodemon cryptoReporter.js
 Integrating Gmail and Twilio APIs with coingecko's API for realtime price information.
 
 # GMAIL API
-This app will require your own API key from Gmail, which will be included in the project in a "credentials.json and a token.json file. More info here: https://developers.google.com/gmail/api/quickstart/nodejs.
+This app will require your own API key from Gmail, which will be included in the project in a credentials.json and a token.json file. More info here: https://developers.google.com/gmail/api/quickstart/nodejs.
 
 Run the app once installed, Follow Google prompts in the cli to confirm and generate your local auth token.
 
@@ -25,7 +25,7 @@ Heck, you could even call someone every year on their birthday.
 # ENVIRONMENT VARIABLES
 API tokens for Gmail and Twilio should be stored in .env file in the root of the project. Accessed through process.env and the dotenv package.
 
-in your .env file, add the folowing variables:
+in your .env file in the root of the project, add the folowing variables:
 
 MY_ACCT_SID= (Twilio Accout SID here)
 MY_TOKEN=(Twilio Token Here)
