@@ -21,8 +21,8 @@ let resultbtc = null;
 let repCount = 0;
 let firstPassBtc = true;
 let percentArray = [];
- let interval = 600000; // --non dev version, set to ten minutes
- // let interval = 10000; // -- dev version
+let interval = 600000; // --non dev version, set to ten minutes
+//  let interval = 10000; // -- dev version
 // 10000 is ten seconds, 60000 is one minute, 3600000 is one hour, 86400000 is 24 hours
 
 let getbtc = async () => {
@@ -36,7 +36,7 @@ let getbtc = async () => {
             if (firstPassBtc) {
                 firstPassBtc = false;
 
-                // lastbtc.push(parseInt(btcResponse.last_price)); // dev version, Int minus float to trigger response
+                 //lastbtc.push(parseInt(btcResponse.last_price)); // dev version, Int minus float to trigger response
 
                 lastbtc.push(parseFloat(btcResponse.last_price));  // non dev version
 
@@ -84,15 +84,12 @@ let getbtc = async () => {
 
                             if (percentArray[b]?.direction) {
                                
-                                message = ` Alert! BTC Price went ${percentArray[b].direction} by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
+                                message = `WOAH NILLY! BTC Price went ${percentArray[b].direction} by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
                                 console.log(message);
                             } else {
-                                message = `Alert! BTC Price changed by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
+                                message = `WOAH NILLY! BTC Price changed by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
                                 console.log(message);
                             }
-
-                            // sendEmail(message);
-
                         }
                     }
 
