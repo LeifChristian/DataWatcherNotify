@@ -1,16 +1,12 @@
-// let accountSid = process.env.MY_ACCT_SID;
-// let authToken = process.env.MY_TOKEN;
-
 const fs = require("fs");
 const readline = require("readline");
 const { google } = require("googleapis");
+const axios = require("axios");
 require('dotenv').config();
-
 const accountSid = process.env.MY_ACCT_SID
 const authToken = process.env.MY_TOKEN
-
-const axios = require("axios");
 const client = require("twilio")(accountSid, authToken);
+
 const config = {
     method: "get",
     url: "https://betconix.com/api/v2/tickers",
@@ -22,12 +18,11 @@ const config = {
 let lastbtc = [];
 let resultbtc = null;
 let repCount = 0;
-
-// 10000 is ten seconds, 60000 is one minute, 3600000 is one hour, 86400000 is 24 hours
-
-let interval = 300000; //(five minutes, full rep in 30 minutes)
 let firstPassBtc = true;
 let percentArray = [];
+ let interval = 600000; // --non dev version, set to ten minutes
+ // let interval = 10000; // -- dev version
+// 10000 is ten seconds, 60000 is one minute, 3600000 is one hour, 86400000 is 24 hours
 
 let getbtc = async () => {
     await axios(config)
@@ -39,7 +34,11 @@ let getbtc = async () => {
 
             if (firstPassBtc) {
                 firstPassBtc = false;
-                lastbtc.push(parseFloat(btcResponse.last_price));
+
+                // lastbtc.push(parseInt(btcResponse.last_price)); // dev version, Int minus float to trigger response
+
+                lastbtc.push(parseFloat(btcResponse.last_price));  // non dev version
+
                 console.log(parseFloat(lastbtc), "current price");
             } else {
                 for (let f in lastbtc) {
@@ -47,14 +46,14 @@ let getbtc = async () => {
                         console.log("-", f);
                         resultbtc = parseFloat(btcResponse.last_price) / parseFloat(lastbtc[f]);
                         percentChange = (100 - resultbtc * 100).toPrecision(1);
-                        percentArray.push({ price: percentChange, directon: "down" });
+                        percentArray.push({ price: percentChange, direction: "down" });
                     }
 
                     if (parseFloat(lastbtc[f]) < parseFloat(btcResponse.last_price)) {
                         console.log("+", f);
                         resultbtc = parseFloat(lastbtc[f]) / parseFloat(btcResponse.last_price);
                         percentChange = (100 - resultbtc * 100).toPrecision(1);
-                        percentArray.push({ price: percentChange, directon: "up" });
+                        percentArray.push({ price: percentChange, direction: "up" });
                     }
                 }
 
@@ -68,49 +67,53 @@ let getbtc = async () => {
                     for (let b in percentArray) {
                         if (percentArray[b].price >= 2 && percentArray[b].price < 5) {
                             if (percentArray[b]?.direction) {
-                                message = `Alert! BTC Price went ${percentArray[b].direction} by ${percentArray[b].price}%`;
+                                message = `Alert! BTC Price went ${percentArray[b].direction} by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
                                 console.log(message);
                             } else {
-                                message = `Alert! BTC Price changed by ${percentArray[b].price}%`;
+                                message = `Alert! BTC Price changed by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
                                 console.log(message);
                             }
                         }
 
-                        if (percentArray[b].price >= 5) {
+                        if (percentArray[b].price >= 5) { // -- non dev version
+
+                        // if (percentArray[b].price < 1) { // -- dev version
+
                             if (percentArray[b]?.direction) {
-                                message = ` Alert! BTC Price went ${percentArray[b].direction} by ${percentArray[b].price}%`;
+                                message = ` Alert! BTC Price went ${percentArray[b].direction} by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
                                 console.log(message);
                             } else {
-                                message = `Alert! BTC Price changed by ${percentArray[b].price}%`;
+                                message = `Alert! BTC Price changed by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
                                 console.log(message);
                             }
 
-                            sendEmail(message);
+                            // sendEmail(message);
 
-                            client.messages
-                                .create({
-                                    body: message,
-                                    messagingServiceSid: "MG6a6e4c67fd4bc51cec5f8e1223cad360",
-                                    to: "+14065390742",
-                                })
-                                .then((message) => console.log(message.sid))
-                                .done();
-
-                            let timeElapsed = Date.now();
-                            const today = new Date(timeElapsed);
-
-                            client.calls
-                                .create({
-                                    twiml: `<Response><Pause length="1"/><Say voice="woman"> ${today.toDateString().slice(4)}!! ${message}</Say></Response>`,
-                                    to: "+14065390742",
-                                    from: "+14062154416",
-                                })
-                                .then((call) => console.log(call.sid));
                         }
                     }
 
                     if (message) {
                         sendEmail(message);
+                        client.messages
+                        .create({
+                            body: message,
+                            messagingServiceSid: "MG6a6e4c67fd4bc51cec5f8e1223cad360",
+                            to: "+14065390742",
+                        })
+                        .then((message) => console.log(message.sid))
+                        .done();
+
+                    let timeElapsed = Date.now();
+                    const today = new Date(timeElapsed);
+
+                    client.calls
+                        .create({
+                            twiml: `<Response><Pause length="1"/><Say voice="woman"> ${today.toDateString().slice(4)}!! ${message}</Say></Response>`,
+                            to: "+14065390742",
+                            from: "+14062154416",
+                        })
+                        .then((call) => console.log(call.sid));
+                        repCount = 6;
                     }
                     resultbtc = null;
                 }
@@ -246,7 +249,7 @@ let sendEmail = async (message) => {
     }
 
     function sendMessage(auth) {
-        var raw = makeBody("mtmusicandart@gmail.com", "", "ALERT - Crypto Movement", message);
+        var raw = makeBody("mtmusicandart@gmail.com", "", "Crypto Price Alert!", message);
         const gmail = google.gmail({ version: "v1", auth });
         gmail.users.messages.send(
             {
