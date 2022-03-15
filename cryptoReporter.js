@@ -19,11 +19,11 @@ let lastbtc = [];
 let URGENT = false;
 let resultbtc = null;
 let repCount = 0;
-let firstPassBtc = true;
+let firstResult = true;
 let percentArray = [];
-let interval = 300000; // --non dev version, set to 5 minutes intervals
+let interval = 300000; // --non dev version, set to 5 minute intervals
 //  let interval = 10000; // -- dev version
-// 10000 is ten seconds, 60000 is one minute, 3600000 is one hour, 86400000 is 24 hours
+// 10000 = 10 seconds, 60000 = 1 minute, 3600000 = 1 hour, 86400000 = 24 hours
 
 let getbtc = async () => {
     await axios(config)
@@ -33,14 +33,14 @@ let getbtc = async () => {
             });
             let btcResponse = filteredResponse[0];
 
-            if (firstPassBtc) {
-                firstPassBtc = false;
+            if (firstResult) {
+                firstResult = false;
 
                 // lastbtc.push(parseInt(btcResponse.last_price)); // dev version, Int minus float to trigger response
 
                 lastbtc.push(parseFloat(btcResponse.last_price));  // non dev version
-
                 console.log(parseFloat(lastbtc), "current price");
+
             } else {
                 for (let f in lastbtc) {
                     if (parseFloat(lastbtc[f]) > parseFloat(btcResponse.last_price)) {
@@ -77,13 +77,9 @@ let getbtc = async () => {
                         }
 
                         if (percentArray[b].price >= 5) { // -- non dev version
-
                         //  if (percentArray[b].price < 1) { // -- dev version
-
                                 URGENT = true;
-
                             if (percentArray[b]?.direction) {
-                               
                                 message = `WOAH NILLY! BTC Price went ${percentArray[b].direction} by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
                                 console.log(message);
                             } else {
@@ -94,11 +90,13 @@ let getbtc = async () => {
                     }
 
                     if (message) {
-                        // sendEmail(message);
-                        console.log(message, "test!!!")
+                        sendEmail(message);
+                        console.log(message)
                         repCount = 6;
                     
                         if(URGENT){
+                            let timeElapsed = Date.now();
+                            const today = new Date(timeElapsed);
 
                         client.messages
                         .create({
@@ -108,10 +106,7 @@ let getbtc = async () => {
                         })
                         .then((message) => console.log(message.sid))
                         .done();
-
-                    let timeElapsed = Date.now();
-                    const today = new Date(timeElapsed);
-
+                    
                     client.calls
                         .create({
                             twiml: `<Response><Pause length="1"/><Say voice="woman"> ${today.toDateString().slice(4)}!! ${message}</Say></Response>`,
@@ -120,8 +115,8 @@ let getbtc = async () => {
                         })
                         .then((call) => console.log(call.sid));
                     }
-                       
                     }
+                    
                     resultbtc = null;
                     URGENT = false;
                     return
@@ -129,25 +124,28 @@ let getbtc = async () => {
             }
         })
         .catch(function (error) {
-            console.log(error); firstPassBtc=true;
+            console.log(error); firstResult=true;
         });
 };
 
-if (firstPassBtc) {
+if (firstResult) {
     getbtc();
 }
 
 setInterval(function () {
-    var date = new Date(); // Or the date you'd like converted.
-    var isoDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
+    let date = new Date();
+
+    let isoDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
 
     let timeString = isoDateTime.slice(0, 19).replace("T", " ").replace("Z", "");
+
     console.log(timeString);
 
     if (repCount < 6) {
         repCount++;
         console.log("rep count", repCount);
         console.log(lastbtc);
+        
     } else {
         repCount = 0;
         lastbtc.splice(0, 7);
@@ -279,8 +277,10 @@ let sendEmail = async (message) => {
             console.log("Error loading client secret file: " + err);
             return;
         }
+
         // Authorize a client with the loaded credentials, then call the
         // Gmail API.
+
         authorize(JSON.parse(content), sendMessage);
     });
 
