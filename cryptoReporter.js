@@ -21,7 +21,7 @@ let resultbtc = null;
 let repCount = 0;
 let firstPassBtc = true;
 let percentArray = [];
-let interval = 600000; // --non dev version, set to ten minutes
+let interval = 300000; // --non dev version, set to 5 minutes intervals
 //  let interval = 10000; // -- dev version
 // 10000 is ten seconds, 60000 is one minute, 3600000 is one hour, 86400000 is 24 hours
 
@@ -36,7 +36,7 @@ let getbtc = async () => {
             if (firstPassBtc) {
                 firstPassBtc = false;
 
-                 //lastbtc.push(parseInt(btcResponse.last_price)); // dev version, Int minus float to trigger response
+                // lastbtc.push(parseInt(btcResponse.last_price)); // dev version, Int minus float to trigger response
 
                 lastbtc.push(parseFloat(btcResponse.last_price));  // non dev version
 
@@ -46,14 +46,14 @@ let getbtc = async () => {
                     if (parseFloat(lastbtc[f]) > parseFloat(btcResponse.last_price)) {
                         console.log("-", f);
                         resultbtc = parseFloat(btcResponse.last_price) / parseFloat(lastbtc[f]);
-                        percentChange = (100 - resultbtc * 100).toPrecision(1);
+                        percentChange = (100 - resultbtc * 100).toPrecision(2);
                         percentArray.push({ price: percentChange, direction: "down" });
                     }
 
                     if (parseFloat(lastbtc[f]) < parseFloat(btcResponse.last_price)) {
                         console.log("+", f);
                         resultbtc = parseFloat(lastbtc[f]) / parseFloat(btcResponse.last_price);
-                        percentChange = (100 - resultbtc * 100).toPrecision(1);
+                        percentChange = (100 - resultbtc * 100).toPrecision(2);
                         percentArray.push({ price: percentChange, direction: "up" });
                     }
                 }
@@ -66,7 +66,7 @@ let getbtc = async () => {
                     console.log(percentChange, "% change");
                     let message;
                     for (let b in percentArray) {
-                        if (percentArray[b].price >= 3 && percentArray[b].price < 5) {
+                        if (percentArray[b].price >= 2 && percentArray[b].price < 5) {
                             if (percentArray[b]?.direction) {
                                 message = `Alert! BTC Price went ${percentArray[b].direction} by ${percentArray[b].price}% and is now ${lastbtc[lastbtc.length-1]}`;
                                 console.log(message);
@@ -78,7 +78,7 @@ let getbtc = async () => {
 
                         if (percentArray[b].price >= 5) { // -- non dev version
 
-                        // if (percentArray[b].price < 1) { // -- dev version
+                        //  if (percentArray[b].price < 1) { // -- dev version
 
                                 URGENT = true;
 
@@ -94,9 +94,10 @@ let getbtc = async () => {
                     }
 
                     if (message) {
-                        sendEmail(message);
+                        // sendEmail(message);
+                        console.log(message, "test!!!")
                         repCount = 6;
-
+                    
                         if(URGENT){
 
                         client.messages
@@ -123,6 +124,7 @@ let getbtc = async () => {
                     }
                     resultbtc = null;
                     URGENT = false;
+                    return
                 }
             }
         })
